@@ -1,0 +1,54 @@
+<!doctype html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <title>The HTML5 Herald</title>
+        <meta name="description" content="The HTML5 Herald">
+        <meta name="author" content="SitePoint">
+
+    </head>
+
+    <body>
+
+        <h3>Hallo , </h3>
+        <ul>
+            <li></li>
+        </ul>
+
+        <script src="js/build/isis-member.js"></script>
+        <script src="js/build/isis-collection.js"></script>
+        <script src="js/build/isis-action.js"></script>
+
+        <script src="js/build/isis-rest-reader.js"></script>
+        <script src="js/build/isis-ajax.js"></script>
+        <script src="js/build/isis-auth.js"></script>
+
+        <script>
+
+            $ISIS.settings = {
+                baseurl: "http://xtalus.apps.gedge.nl/simple/restful/services/info.matchingservice.dom.Api.api/",
+                method: 'GET',
+            };
+
+            $ISIS.auth.login('frans', 'pass', function(){
+                console.log('Logged in');
+            });
+
+            $ISIS.init(function(data){
+                console.log(data);
+                data.activePerson.invoke({}, initActivePerson);
+            });
+
+            function initActivePerson(result){
+                console.log(result)
+                var demands = result.collectDemands
+                console.log(demands);
+                demands.extract(function(result){
+                    console.log(result);
+                });
+            }
+        </script>
+    </body>
+</html>
