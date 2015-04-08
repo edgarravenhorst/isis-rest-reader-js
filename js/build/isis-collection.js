@@ -1,6 +1,5 @@
-'use strict';
-
 var IsisCollection = function(memberData) {
+
     IsisMember.call(this, memberData);
 
     this.collectValOnReady = false;
@@ -16,13 +15,18 @@ var IsisCollection = function(memberData) {
             this.isReady = true;
             this.values = result.value;
 
+            var initValue = function(value){
+                value.collect = function(){
+                    this.collectValue(value);
+                };
+            };
 
             for(var i=0; i<this.values.length; i++){
                 var value = this.values[i];
-                value.collect = function(){
-                    this.collectValue(value);
-                }
+                initValue(value);
             }
+
+
 
             if (this.extractOnReady) this.extract(this.onExtractCompleteFunc);
             if (this.collectValOnReady) this.collectValue(this.onCollectValCompleteFunc);
@@ -31,7 +35,7 @@ var IsisCollection = function(memberData) {
         }.bind(this));
 
         return this;
-    }
+    };
 
     this.extract = function(onCompleteFunc){
         var data = this.values;
@@ -44,18 +48,19 @@ var IsisCollection = function(memberData) {
             this.extractOnReady = true;
             return;
         }
+        var valueCollected = function(result){
+            extractedData.push(result);
+            countExtracted ++;
+            if(countExtracted == data.length) onCompleteFunc(extractedData);
+        };
 
         for(var i=0; i<data.length; i++){
             var value = data[i];
-            this.collectValue(value, function(result){
-                extractedData.push(result);
-                countExtracted ++;
-                if(countExtracted == data.length) onCompleteFunc(extractedData);
-            });
+            this.collectValue(value, valueCollected);
         }
 
         return this;
-    }
+    };
 
     this.collectValue = function(value, onCollectedFunc){
 
@@ -72,7 +77,7 @@ var IsisCollection = function(memberData) {
             value.rawdata = rawdata;
             onCollectedFunc(value);
         });
-    }
+    };
 };
 
 IsisCollection.prototype = Object.create(IsisMember.prototype);

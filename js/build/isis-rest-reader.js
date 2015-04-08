@@ -1,6 +1,6 @@
-'use strict';
-
 var ISIS = function(){
+
+    'use strict';
 
     this.settings = {
         baseurl: "http://xtalus.apps.gedge.nl/simple/restful/",
@@ -15,7 +15,7 @@ var ISIS = function(){
             var members = this.extractMembers(data);
             this.onReadyFunc(members);
 
-        }.bind(this))
+        }.bind(this));
     };
 
     this.extractMembers = function(data){
@@ -37,15 +37,13 @@ var ISIS = function(){
 
                 default :
                     member = memberdata.value;
-                    break
+                    break;
             }
 
-            //console.log(memberdata);
             obj[name] = member;
         }
-
         return obj;
-    }
+    };
 };
 
 var $ISIS = $ISIS || new ISIS();

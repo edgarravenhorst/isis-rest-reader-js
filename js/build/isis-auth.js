@@ -1,10 +1,9 @@
-'use strict';
-
 ISIS.prototype.auth = {
+
     login : function (username, password, callback) {
 
-        /* Use this for real authentication
-             ----------------------------------------------*/
+        'use strict';
+
         var response = {};
 
         $ISIS.ajax ('http://xtalus.apps.gedge.nl/simple/restful/user', {
@@ -24,6 +23,9 @@ ISIS.prototype.auth = {
     base64 : {
 
         encode: function (input) {
+
+            'use strict';
+
             var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
             var output = "";
             var chr1, chr2, chr3 = "";
