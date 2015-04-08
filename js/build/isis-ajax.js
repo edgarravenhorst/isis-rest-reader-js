@@ -2,6 +2,8 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
 
     'use strict';
 
+    if (typeof url !== 'string') return false;
+
     settings.method = settings.method || "GET";
     settings.headers = settings.headers || {};
     settings.format = settings.format || '';

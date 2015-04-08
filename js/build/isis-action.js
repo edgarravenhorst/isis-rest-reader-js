@@ -4,6 +4,7 @@ var IsisAction = function(memberData) {
 
     IsisMember.call(this, memberData);
 
+    this.invokeReadyFunc = function(){};
     this.doInvokeOnReady = false;
 
     this.prepare = function(){
@@ -22,7 +23,6 @@ var IsisAction = function(memberData) {
             this.doInvokeOnReady = true;
             return;
         }
-
         $ISIS.ajax(this.url + '/invoke', {
             format:'json',
             method:this.rawdata.links[2].method
@@ -38,7 +38,7 @@ var IsisAction = function(memberData) {
 
         for (var name in data.result.value) {
             var value = data.result.value[name];
-            $ISIS.ajax(value.href, {format:'json'}, responseFunc);
+            $ISIS.ajax(value.href, {format:'json'}, responseFunc.bind(this));
         }
     };
 
