@@ -19,6 +19,9 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
             }else if(request.status == 400) {
                 console.log('There was an error 400');
                 if(onErrorFunc) onErrorFunc(request);
+            }else if(request.status == 401) {
+                console.log('Unauthorized');
+                if(onErrorFunc) onErrorFunc(request);
             }else {
                 console.log('something else other than 200 was returned');
                 if(onErrorFunc) onErrorFunc(request);
@@ -28,6 +31,8 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
 
     request.open(settings.method, url, true);
 
+    var user_cookie = $ISIS.getCookie('auth');
+    if (user_cookie !== "") $ISIS.authHeader = user_cookie;
     if (settings.headers.Authorization) $ISIS.authHeader = settings.headers.Authorization;
     if ($ISIS.authHeader) request.setRequestHeader('Authorization', $ISIS.authHeader);
 

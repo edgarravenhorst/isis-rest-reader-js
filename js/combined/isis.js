@@ -192,6 +192,31 @@ var ISIS = function(){
         }
         return obj;
     };
+
+    this.setCookie = function(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+d.toUTCString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+    };
+
+    this.getCookie = function(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1);
+            if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
+        }
+        return "";
+    };
+
+    this.deleteCookie = function(cname)
+    {
+        var date = new Date();
+        date.setDate(date.getDate() -1);
+        document.cookie = escape(cname) + '=;expires=' + date;
+    };
 };
 
 var $ISIS = $ISIS || new ISIS();
@@ -217,6 +242,9 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
             }else if(request.status == 400) {
                 console.log('There was an error 400');
                 if(onErrorFunc) onErrorFunc(request);
+            }else if(request.status == 401) {
+                console.log('Unauthorized');
+                if(onErrorFunc) onErrorFunc(request);
             }else {
                 console.log('something else other than 200 was returned');
                 if(onErrorFunc) onErrorFunc(request);
@@ -226,12 +254,13 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
 
     request.open(settings.method, url, true);
 
+    var user_cookie = $ISIS.getCookie('auth');
+    if (user_cookie !== "") $ISIS.authHeader = user_cookie;
     if (settings.headers.Authorization) $ISIS.authHeader = settings.headers.Authorization;
     if ($ISIS.authHeader) request.setRequestHeader('Authorization', $ISIS.authHeader);
 
     request.send();
 };
-
 ISIS.prototype.auth = {
 
     login : function (username, password, callback) {
@@ -245,6 +274,7 @@ ISIS.prototype.auth = {
             headers: {'Authorization': 'Basic ' + this.base64.encode(username + ':' + password) }
         },
         function(data) {
+            $ISIS.setCookie('auth', 'Basic ' + $ISIS.auth.base64.encode(username + ':' + password), 5);
             response = { success: username === data.userName };
             callback(response);
         },
@@ -252,6 +282,10 @@ ISIS.prototype.auth = {
             response.message = 'Gebruikersnaam of wachtwoord is niet juist';
             callback(response);
         });
+    },
+
+    logout : function () {
+        $ISIS.deleteCookie('auth');
     },
 
     base64 : {

@@ -11,6 +11,7 @@ ISIS.prototype.auth = {
             headers: {'Authorization': 'Basic ' + this.base64.encode(username + ':' + password) }
         },
         function(data) {
+            $ISIS.setCookie('auth', 'Basic ' + $ISIS.auth.base64.encode(username + ':' + password), 5);
             response = { success: username === data.userName };
             callback(response);
         },
@@ -18,6 +19,10 @@ ISIS.prototype.auth = {
             response.message = 'Gebruikersnaam of wachtwoord is niet juist';
             callback(response);
         });
+    },
+
+    logout : function () {
+        $ISIS.deleteCookie('auth');
     },
 
     base64 : {
