@@ -261,6 +261,7 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
 
     request.send();
 };
+
 ISIS.prototype.auth = {
 
     login : function (username, password, callback) {
@@ -269,7 +270,7 @@ ISIS.prototype.auth = {
 
         var response = {};
 
-        $ISIS.ajax ('http://xtalus.apps.gedge.nl/simple/restful/user', {
+        $ISIS.ajax ('http://xtalus.apps.gedge.nl/simple/restful/user?time='+new Date().getTime(), {
             method: 'get',
             headers: {'Authorization': 'Basic ' + this.base64.encode(username + ':' + password) }
         },
