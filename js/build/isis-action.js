@@ -25,11 +25,19 @@ var IsisAction = function(memberData) {
         }
         $ISIS.ajax(this.url + '/invoke', {
             format:'json',
-            method:this.rawdata.links[2].method
-        }, this.result.bind(this), this.onError);
+            method:this.rawdata.links[2].method,
+            params:params,
+        }, this.result.bind(this), function(errordata){
+            if (errordata.status == 400) console.log('required parameters: ', this.requiredParams);
+            this.onError(errordata);
+        }.bind(this));
     };
 
     this.result = function(data){
+        if (!data.result.value) {
+            this.invokeReadyFunc(data);
+            return;
+        }
 
         var responseFunc = function(data){
             var result = $ISIS.extractMembers(data);
