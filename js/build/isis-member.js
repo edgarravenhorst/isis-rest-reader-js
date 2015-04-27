@@ -8,5 +8,6 @@ var IsisMember = function(memberData) {
 
     this.onError = function(error){
         console.log('status: ' + error.status + ' | ' + error.statusText + '\n message: ', error);
+        return error;
     };
 };

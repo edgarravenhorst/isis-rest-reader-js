@@ -17,6 +17,8 @@
             <li></li>
         </ul>
 
+        <script src="node_modules/es6-promise/dist/es6-promise.min.js"></script>
+
         <script src="js/build/isis-member.js"></script>
         <script src="js/build/isis-collection.js"></script>
         <script src="js/build/isis-action.js"></script>
@@ -40,30 +42,30 @@
 
             function initActivePerson(result){
                 console.log(result)
-                /*var demands = result.collectDemands
-                console.log(demands);
-                demands.extract(function(result){
-                    console.log(result);
-                });
-                */
-                console.log(result);
-                result.createPersonsDemand.invoke({
-                    demandDescription: 'dit is een test'
-                }, function(result){
-                    console.log('resultaat',result);
-                })
+                return result;
             }
 
-            $ISIS.init(function(data){
-                data.findDemandByUniqueId.invoke({
+            $ISIS.init().then(function(members){
+                console.log(members);
+                members.activePerson.invoke()
+                    .then(initActivePerson)
+                    .then(
+                    function(result){
+                        console.log(result);
+
+                        return result.collectDemands.extract();
+                    })
+                    .then(
+                    function(demands){
+                        console.log(demands)
+                    })
+
+                members.findDemandByUniqueId.invoke({
                     uUID:'86ba1c8a-a15b-4a29-b794-87595e3aacae'
-                },function(demand){
+                }).then(function(demand){
                     console.log(demand);
                 });
-                data.activePerson.invoke({}, initActivePerson);
             });
-
-
         </script>
     </body>
 </html>

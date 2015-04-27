@@ -7,14 +7,14 @@ var ISIS = function(){
         method: 'GET',
     };
 
-    this.init = function(onReadyFunc) {
-        this.onReadyFunc = onReadyFunc || function(){};
+    this.init = function(url) {
 
-        this.ajax(this.settings.baseurl, {format:'json'}, function(data){
-
-            var members = this.extractMembers(data);
-            this.onReadyFunc(members);
-
+        url = url || this.settings.baseurl;
+        return this.ajax(url).then( function(data){
+            return new Promise(function(resolve, reject) {
+                var members = $ISIS.extractMembers(data);
+                resolve(members);
+            });
         }.bind(this));
     };
 

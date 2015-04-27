@@ -7,6 +7,7 @@ module.exports = function(grunt) {
         concat:{
             basic:{
                 src: [
+                    'node_modules/es6-promise/dist/es6-promise.min.js',
                     'js/build/isis-member.js',
                     'js/build/isis-collection.js',
                     'js/build/isis-action.js',
