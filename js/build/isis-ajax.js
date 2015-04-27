@@ -1,16 +1,19 @@
-ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
+ISIS.prototype.ajax = function(url, settings) {
 
     'use strict';
 
     return new Promise(function(resolve, reject){
 
-        if (typeof url !== 'string') return false;
+        if (typeof url !== 'string') {
+            reject('url is not a string, type=' + typeof url, url);
+            return;
+        }
 
         settings = settings || {};
         settings.method = settings.method || "GET";
         settings.headers = settings.headers || {};
         settings.format = settings.format || 'json';
-        settings.params = settings.params || null;
+        settings.params = settings.params || {};
 
         var request = new XMLHttpRequest();
 
@@ -19,21 +22,15 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
                 if(request.status == 200){
                     var response = request.responseText;
                     if(settings.format == 'json') response = JSON.parse(response);
-                    //console.log(url, settings, response);
-
-                    if(onSuccesFunc) onSuccesFunc(response);
                     resolve(response);
                 }else if(request.status == 400) {
                     console.log('There was an error 400');
-                    if(onErrorFunc) onErrorFunc(request);
                     reject(request);
                 }else if(request.status == 401) {
                     console.log('Unauthorized');
-                    if(onErrorFunc) onErrorFunc(request);
                     reject(request);
                 }else {
                     console.log('something else other than 200 was returned');
-                    if(onErrorFunc) onErrorFunc(request);
                     reject(request);
                 }
             }
@@ -46,7 +43,6 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
                 vars += "&";
             else
                 vars+='?';
-
             vars += key + "=" + encodeURIComponent(settings.params[key]);
         }
         //}

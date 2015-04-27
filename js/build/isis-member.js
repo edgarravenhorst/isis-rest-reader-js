@@ -7,7 +7,7 @@ var IsisMember = function(memberData) {
     this.isReady = false;
 
     this.onError = function(error){
-        console.log('status: ' + error.status + ' | ' + error.statusText + '\n message: ', error);
+        console.log(error);
         return error;
     };
 };

@@ -34,7 +34,7 @@
                 method: 'GET',
             };
 
-            $ISIS.auth.login('frans', 'pass', function(){
+            $ISIS.auth.login('frans', 'pass').then(function(){
                 console.log('Logged in');
             });
 

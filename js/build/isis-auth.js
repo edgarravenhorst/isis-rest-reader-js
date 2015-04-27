@@ -6,18 +6,14 @@ ISIS.prototype.auth = {
 
         var response = {};
 
-        $ISIS.ajax ('http://xtalus.apps.gedge.nl/simple/restful/user?time='+new Date().getTime(), {
+        return $ISIS.ajax('http://xtalus.apps.gedge.nl/simple/restful/user?time='+new Date().getTime(), {
             method: 'get',
             headers: {'Authorization': 'Basic ' + this.base64.encode(username + ':' + password) }
-        },
-        function(data) {
+        }).then( function(data) {
             $ISIS.setCookie('auth', 'Basic ' + $ISIS.auth.base64.encode(username + ':' + password), 5);
             response = { success: username === data.userName };
-            callback(response);
-        },
-        function(error){
+        },function(error){
             response.message = 'Gebruikersnaam of wachtwoord is niet juist';
-            callback(response);
         });
     },
 

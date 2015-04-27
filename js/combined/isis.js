@@ -16,7 +16,7 @@ var IsisMember = function(memberData) {
     this.isReady = false;
 
     this.onError = function(error){
-        console.log('status: ' + error.status + ' | ' + error.statusText + '\n message: ', error);
+        console.log(error);
         return error;
     };
 };
@@ -89,19 +89,21 @@ var IsisAction = function(memberData) {
                     params:params,
                 });
             })
-            .then(this.result)
+            .then(self.result)
             .catch(
             function(errordata){
-                if (errordata.status == 400) console.log('required parameters: ', this.requiredParams);
-                this.onError(errordata);
+                if (errordata.status == 400) console.log('required parameters: ', self.requiredParams);
+                self.onError(errordata);
             });
     };
 
     this.prepare = function(){
-        return $ISIS.ajax(this.url, {}, function(data){
-            this.rawdata = data;
-            this.requiredParams = data.parameters;
-        }.bind(this), this.onError);
+        var self = this;
+        return $ISIS.ajax(this.url).then(function(data){
+            self.rawdata = data;
+            self.requiredParams = data.parameters;
+            return data;
+        }, self.onError);
     };
 
     this.result = function(data){
@@ -113,8 +115,8 @@ var IsisAction = function(memberData) {
             }
 
             var a_promises = [];
-            for (var name in data.result.value) {
-                var value = data.result.value[name];
+            for (var i=0; i < data.result.value.length; i++) {
+                var value = data.result.value[i];
                 a_promises.push($ISIS.ajax(value.href));
             }
 
@@ -132,6 +134,7 @@ var IsisAction = function(memberData) {
             });
         });
     };
+
 };
 
 IsisAction.prototype = Object.create(IsisMember.prototype);
@@ -212,19 +215,22 @@ var ISIS = function(){
 
 var $ISIS = $ISIS || new ISIS();
 
-ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
+ISIS.prototype.ajax = function(url, settings) {
 
     'use strict';
 
     return new Promise(function(resolve, reject){
 
-        if (typeof url !== 'string') return false;
+        if (typeof url !== 'string') {
+            reject('url is not a string, type=' + typeof url, url);
+            return;
+        }
 
         settings = settings || {};
         settings.method = settings.method || "GET";
         settings.headers = settings.headers || {};
         settings.format = settings.format || 'json';
-        settings.params = settings.params || null;
+        settings.params = settings.params || {};
 
         var request = new XMLHttpRequest();
 
@@ -233,21 +239,15 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
                 if(request.status == 200){
                     var response = request.responseText;
                     if(settings.format == 'json') response = JSON.parse(response);
-                    //console.log(url, settings, response);
-
-                    if(onSuccesFunc) onSuccesFunc(response);
                     resolve(response);
                 }else if(request.status == 400) {
                     console.log('There was an error 400');
-                    if(onErrorFunc) onErrorFunc(request);
                     reject(request);
                 }else if(request.status == 401) {
                     console.log('Unauthorized');
-                    if(onErrorFunc) onErrorFunc(request);
                     reject(request);
                 }else {
                     console.log('something else other than 200 was returned');
-                    if(onErrorFunc) onErrorFunc(request);
                     reject(request);
                 }
             }
@@ -260,7 +260,6 @@ ISIS.prototype.ajax = function(url, settings, onSuccesFunc, onErrorFunc) {
                 vars += "&";
             else
                 vars+='?';
-
             vars += key + "=" + encodeURIComponent(settings.params[key]);
         }
         //}
@@ -287,18 +286,14 @@ ISIS.prototype.auth = {
 
         var response = {};
 
-        $ISIS.ajax ('http://xtalus.apps.gedge.nl/simple/restful/user?time='+new Date().getTime(), {
+        return $ISIS.ajax('http://xtalus.apps.gedge.nl/simple/restful/user?time='+new Date().getTime(), {
             method: 'get',
             headers: {'Authorization': 'Basic ' + this.base64.encode(username + ':' + password) }
-        },
-        function(data) {
+        }).then( function(data) {
             $ISIS.setCookie('auth', 'Basic ' + $ISIS.auth.base64.encode(username + ':' + password), 5);
             response = { success: username === data.userName };
-            callback(response);
-        },
-        function(error){
+        },function(error){
             response.message = 'Gebruikersnaam of wachtwoord is niet juist';
-            callback(response);
         });
     },
 

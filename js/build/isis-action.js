@@ -14,19 +14,21 @@ var IsisAction = function(memberData) {
                     params:params,
                 });
             })
-            .then(this.result)
+            .then(self.result)
             .catch(
             function(errordata){
-                if (errordata.status == 400) console.log('required parameters: ', this.requiredParams);
-                this.onError(errordata);
+                if (errordata.status == 400) console.log('required parameters: ', self.requiredParams);
+                self.onError(errordata);
             });
     };
 
     this.prepare = function(){
-        return $ISIS.ajax(this.url, {}, function(data){
-            this.rawdata = data;
-            this.requiredParams = data.parameters;
-        }.bind(this), this.onError);
+        var self = this;
+        return $ISIS.ajax(this.url).then(function(data){
+            self.rawdata = data;
+            self.requiredParams = data.parameters;
+            return data;
+        }, self.onError);
     };
 
     this.result = function(data){
@@ -38,8 +40,8 @@ var IsisAction = function(memberData) {
             }
 
             var a_promises = [];
-            for (var name in data.result.value) {
-                var value = data.result.value[name];
+            for (var i=0; i < data.result.value.length; i++) {
+                var value = data.result.value[i];
                 a_promises.push($ISIS.ajax(value.href));
             }
 
@@ -57,6 +59,7 @@ var IsisAction = function(memberData) {
             });
         });
     };
+
 };
 
 IsisAction.prototype = Object.create(IsisMember.prototype);
