@@ -6,7 +6,7 @@ ISIS.prototype.auth = {
 
         var response = {};
 
-        return $ISIS.ajax('http://xtalus.apps.gedge.nl/simple/restful/user?time='+new Date().getTime(), {
+        return $ISIS.ajax($ISIS.settings.baseurl + '?time='+new Date().getTime(), {
             method: 'get',
             headers: {'Authorization': 'Basic ' + this.base64.encode(username + ':' + password) }
         }).then( function(data) {
