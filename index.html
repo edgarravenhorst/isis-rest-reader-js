@@ -30,11 +30,11 @@
         <script>
 
             $ISIS.settings = {
-                baseurl: "http://xtalus.apps.gedge.nl/simple/restful/services/info.matchingservice.dom.Api.api/",
+                baseurl: "http://acc.xtalus.gedge.nl/simple/restful/services/info.matchingservice.dom.Api.api/",
                 method: 'GET',
             };
 
-            $ISIS.auth.login('frans', 'a').then(function(data){
+            $ISIS.auth.login('frans', 'pass').then(function(data){
                 console.log(data);
             });
 
@@ -45,7 +45,20 @@
                 return result;
             }
 
-            $ISIS.init().then(function(members){
+            //{"username" : "hoi1234" , "password" : "hoi", "passwordConfirm" : "hoi", "email" : "email.johan@somewhere.nl"}
+
+            var params = {
+                username: "johan",
+                password: "pass",
+                passwordConfirm: "pass",
+                email: "test@test.nl"
+            };
+
+            $ISIS.init('http://acc.xtalus.gedge.nl/simple/restful/register', 'PUT', params, 'flat').then(function(result){
+                console.log('put:', result);
+            });
+
+            /*$ISIS.init().then(function(members){
                 console.log(members);
                 members.activePerson.invoke()
                     .then(initActivePerson)
@@ -65,7 +78,7 @@
                 }).then(function(demand){
                     console.log(demand);
                 });
-            });
+            });*/
         </script>
     </body>
 </html>

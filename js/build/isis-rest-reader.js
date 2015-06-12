@@ -7,10 +7,18 @@ var ISIS = function(){
         method: 'GET',
     };
 
-    this.init = function(url) {
+    this.init = function(url, method, params, jsonFormat) {
 
         url = url || this.settings.baseurl;
-        return this.ajax(url).then( function(data){
+        method = method || 'GET';
+        params = params || {};
+
+        var settings = {};
+        settings.method = method;
+        settings.params = params;
+        settings.jsonFormat = jsonFormat;
+
+        return this.ajax(url, settings).then(function(data){
             return new Promise(function(resolve, reject) {
                 var members = $ISIS.extractMembers(data);
                 resolve(members);

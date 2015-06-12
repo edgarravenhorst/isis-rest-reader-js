@@ -140,10 +140,18 @@ var ISIS = function(){
         method: 'GET',
     };
 
-    this.init = function(url) {
+    this.init = function(url, method, params, jsonFormat) {
 
         url = url || this.settings.baseurl;
-        return this.ajax(url).then( function(data){
+        method = method || 'GET';
+        params = params || {};
+
+        var settings = {};
+        settings.method = method;
+        settings.params = params;
+        settings.jsonFormat = jsonFormat;
+
+        return this.ajax(url, settings).then(function(data){
             return new Promise(function(resolve, reject) {
                 var members = $ISIS.extractMembers(data);
                 resolve(members);
@@ -218,10 +226,18 @@ ISIS.prototype.ajax = function(url, settings) {
         }
 
         settings = settings || {};
+
         settings.method = settings.method || "GET";
         settings.headers = settings.headers || {};
         settings.format = settings.format || 'json';
         settings.params = settings.params || {};
+        settings.jsonFormat = settings.jsonFormat || 'isis';
+
+        if (settings.jsonFormat === 'isis' && settings.method === 'POST') {
+            for(var property in settings.params) {
+                settings.params[property] = { value:settings.params[property] };
+            }
+        }
 
         var request = new XMLHttpRequest();
 
@@ -244,18 +260,20 @@ ISIS.prototype.ajax = function(url, settings) {
             }
         };
 
-        //if(settings.method == "GET"){
-        var vars = "";
-        for (var key in settings.params) {
-            if (vars !== "")
-                vars += "&";
-            else
-                vars+='?';
-            vars += key + "=" + encodeURIComponent(settings.params[key]);
-        }
-        //}
+        if(settings.method == "GET"){
+            var vars = "";
+            for (var key in settings.params) {
+                if (vars !== "")
+                    vars += "&";
+                else
+                    vars+='?';
+                vars += key + "=" + encodeURIComponent(settings.params[key]);
+            }
 
-        request.open(settings.method, url+vars, true);
+            url+=vars;
+        }
+
+        request.open(settings.method, url, true);
         request.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
 
         var user_cookie = $ISIS.getCookie('auth');
@@ -264,8 +282,7 @@ ISIS.prototype.ajax = function(url, settings) {
         if ($ISIS.authHeader) request.setRequestHeader('Authorization', $ISIS.authHeader);
 
         if (settings.method === 'GET') request.send();
-        else request.send();
-        //else request.send(JSON.stringify(settings.params));
+        else request.send(JSON.stringify(settings.params));
     });
 };
 
