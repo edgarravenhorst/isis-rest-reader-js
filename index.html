@@ -1,0 +1,71 @@
+<!doctype html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <title>The HTML5 Herald</title>
+        <meta name="description" content="The HTML5 Herald">
+        <meta name="author" content="SitePoint">
+
+    </head>
+
+    <body>
+
+        <h3>Hallo , </h3>
+        <ul>
+            <li></li>
+        </ul>
+
+        <script src="node_modules/es6-promise/dist/es6-promise.min.js"></script>
+
+        <script src="js/build/isis-member.js"></script>
+        <script src="js/build/isis-collection.js"></script>
+        <script src="js/build/isis-action.js"></script>
+
+        <script src="js/build/isis-rest-reader.js"></script>
+        <script src="js/build/isis-ajax.js"></script>
+        <script src="js/build/isis-auth.js"></script>
+
+        <script>
+
+            $ISIS.settings = {
+                baseurl: "http://xtalus.apps.gedge.nl/simple/restful/services/info.matchingservice.dom.Api.api/",
+                method: 'GET',
+            };
+
+            $ISIS.auth.login('frans', 'a').then(function(data){
+                console.log(data);
+            });
+
+            //$ISIS.auth.logout();
+
+            function initActivePerson(result){
+                console.log(result)
+                return result;
+            }
+
+            $ISIS.init().then(function(members){
+                console.log(members);
+                members.activePerson.invoke()
+                    .then(initActivePerson)
+                    .then(
+                    function(result){
+                        console.log(result);
+
+                        return result.collectDemands.extract();
+                    })
+                    .then(
+                    function(demands){
+                        console.log(demands)
+                    })
+
+                members.findDemandByUniqueId.invoke({
+                    uUID:'86ba1c8a-a15b-4a29-b794-87595e3aacae'
+                }).then(function(demand){
+                    console.log(demand);
+                });
+            });
+        </script>
+    </body>
+</html>
