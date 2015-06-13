@@ -54,8 +54,8 @@
                 email: "test@test.nl"
             };
 
-            $ISIS.init('http://acc.xtalus.gedge.nl/simple/restful/register', 'PUT', params, 'flat').then(function(result){
-                console.log('put:', result);
+            $ISIS.post('http://acc.xtalus.gedge.nl/simple/restful/register', params, false).then(function(result){
+                console.log('result:', result);
             });
 
             /*$ISIS.init().then(function(members){

@@ -159,6 +159,18 @@ var ISIS = function(){
         }.bind(this));
     };
 
+    this.post = function(url, params, formatJsonForIsis) {
+        url = url || '';
+        params = params || {};
+
+        var settings = {};
+        settings.method = "POST";
+        settings.params = params;
+        settings.formatJsonForIsis = formatJsonForIsis;
+
+        return this.ajax(url, settings);
+    };
+
     this.extractMembers = function(data){
         if (!data.members) return;
         var members = data.members;
@@ -231,9 +243,9 @@ ISIS.prototype.ajax = function(url, settings) {
         settings.headers = settings.headers || {};
         settings.format = settings.format || 'json';
         settings.params = settings.params || {};
-        settings.jsonFormat = settings.jsonFormat || 'isis';
+        settings.formatJsonForIsis = (settings.formatJsonForIsis === undefined) ? true : settings.formatJsonForIsis;
 
-        if (settings.jsonFormat === 'isis' && settings.method === 'POST') {
+        if (settings.formatJsonForIsis && settings.method !== 'GET') {
             for(var property in settings.params) {
                 settings.params[property] = { value:settings.params[property] };
             }
@@ -260,7 +272,7 @@ ISIS.prototype.ajax = function(url, settings) {
             }
         };
 
-        if(settings.method == "GET"){
+        if(settings.method === "GET"){
             var vars = "";
             for (var key in settings.params) {
                 if (vars !== "")
@@ -269,7 +281,6 @@ ISIS.prototype.ajax = function(url, settings) {
                     vars+='?';
                 vars += key + "=" + encodeURIComponent(settings.params[key]);
             }
-
             url+=vars;
         }
 

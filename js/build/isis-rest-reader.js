@@ -26,6 +26,18 @@ var ISIS = function(){
         }.bind(this));
     };
 
+    this.post = function(url, params, formatJsonForIsis) {
+        url = url || '';
+        params = params || {};
+
+        var settings = {};
+        settings.method = "POST";
+        settings.params = params;
+        settings.formatJsonForIsis = formatJsonForIsis;
+
+        return this.ajax(url, settings);
+    };
+
     this.extractMembers = function(data){
         if (!data.members) return;
         var members = data.members;

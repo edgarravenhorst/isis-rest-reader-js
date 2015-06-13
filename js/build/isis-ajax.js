@@ -15,9 +15,9 @@ ISIS.prototype.ajax = function(url, settings) {
         settings.headers = settings.headers || {};
         settings.format = settings.format || 'json';
         settings.params = settings.params || {};
-        settings.jsonFormat = settings.jsonFormat || 'isis';
+        settings.formatJsonForIsis = (settings.formatJsonForIsis === undefined) ? true : settings.formatJsonForIsis;
 
-        if (settings.jsonFormat === 'isis' && settings.method !== 'GET') {
+        if (settings.formatJsonForIsis && settings.method !== 'GET') {
             for(var property in settings.params) {
                 settings.params[property] = { value:settings.params[property] };
             }
