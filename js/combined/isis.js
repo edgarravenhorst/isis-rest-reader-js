@@ -135,6 +135,13 @@ var ISIS = function(){
 
     'use strict';
 
+    this.storeMembers = undefined;
+
+    this.store = (function(members){
+        if (members) return members;
+        console.error('Please use $ISIS.init() before using the store');
+    })(this.storeMembers);
+
     this.settings = {
         baseurl: "http://xtalus.apps.gedge.nl/simple/restful/",
         method: 'GET',
@@ -146,6 +153,7 @@ var ISIS = function(){
         method = method || 'GET';
         params = params || {};
 
+        var self = this;
         var settings = {};
         settings.method = method;
         settings.params = params;
@@ -154,9 +162,10 @@ var ISIS = function(){
         return this.ajax(url, settings).then(function(data){
             return new Promise(function(resolve, reject) {
                 var members = $ISIS.extractMembers(data);
+                if(url === self.settings.baseurl) self.store = members;
                 resolve(members);
             });
-        }.bind(this));
+        });
     };
 
     this.post = function(url, params, formatJsonForIsis) {
