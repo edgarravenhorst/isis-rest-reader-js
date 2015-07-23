@@ -40,14 +40,9 @@
 
             //$ISIS.auth.logout();
 
-            function initActivePerson(result){
-                console.log(result)
-                return result;
-            }
-
             //{"username" : "hoi1234" , "password" : "hoi", "passwordConfirm" : "hoi", "email" : "email.johan@somewhere.nl"}
 
-/*
+            /*
             var params = {
                 username: "johan",
                 password: "pass",
@@ -56,19 +51,34 @@
             };
 */
 
-            /*$ISIS.post('http://acc.xtalus.gedge.nl/simple/restful/register', params, false).then(function(result){
+/*
+            $ISIS.post('http://acc.xtalus.gedge.nl/simple/restful/register/', params, false).then(function(result){
                 console.log('result:', result);
-            });*/
 
-            //console.log($ISIS.store)
 
-            $ISIS.init().then(function(members){
-                console.log($ISIS.store);
+            });
+*/
+
+            $ISIS.get("http://acc.xtalus.gedge.nl/simple/restful/activeperson").then(function(result){
+                console.log(result);
+                var a_promises = [];
+                for (var i=0; i<result.demands.length; i++){
+                    a_promises.push( $ISIS.get("http://acc.xtalus.gedge.nl/simple/restful/"+result.demands[i].URI));
+                }
+                Promise.all(a_promises).then(function(demands){
+                    for (var i=0; i<result.demands.length; i++){
+                        console.log('newURL: ', $ISIS.extractMembers(demands[0]));
+                    }
+                });
+            })
+
+           /*$ISIS.init().then(function(members){
+                //console.log($ISIS.store);
                 $ISIS.store.activePerson.invoke()
                     .then(initActivePerson)
                     .then(
                     function(result){
-                        console.log(result);
+                        //console.log(result);
 
                         return result.collectDemands.extract();
                     })
@@ -76,13 +86,12 @@
                     function(demands){
                         console.log(demands)
                     })
+            });*/
 
-                members.findDemandByUniqueId.invoke({
-                    uUID:'86ba1c8a-a15b-4a29-b794-87595e3aacae'
-                }).then(function(demand){
-                    console.log(demand);
-                });
-            });
+            function initActivePerson(result){
+                //console.log(result)
+                return result;
+            }
         </script>
     </body>
 </html>

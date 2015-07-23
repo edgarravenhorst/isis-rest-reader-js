@@ -3,9 +3,11 @@ var IsisAction = function(memberData) {
     'use strict';
 
     IsisMember.call(this, memberData);
+    this.autoInitResult = true;
 
-    this.invoke = function (params) {
+    this.invoke = function (params, autoInitResult) {
         var self = this;
+        self.autoInitResult = autoInitResult || true;
         return this.prepare()
             .then(
             function(rawdata){
@@ -14,7 +16,7 @@ var IsisAction = function(memberData) {
                     params:params,
                 });
             })
-            .then(self.result)
+            .then(self.result.bind(self))
             .catch(
             function(errordata){
                 if (errordata.status == 400) console.log('required parameters: ', self.requiredParams);
@@ -27,36 +29,42 @@ var IsisAction = function(memberData) {
         return $ISIS.ajax(this.url).then(function(data){
             self.rawdata = data;
             self.requiredParams = data.parameters;
+            //Optional: Check params here before invoke
             return data;
         }, self.onError);
     };
 
     this.result = function(data){
+        var self = this;
         return new Promise(function(resolve, reject){
-
             if (!data.result.value) {
                 resolve(data);
                 return;
             }
 
-            var a_promises = [];
-            for (var i=0; i < data.result.value.length; i++) {
-                var value = data.result.value[i];
-                a_promises.push($ISIS.ajax(value.href));
-            }
+            if (typeof data.result.value === 'string') resolve(data.result.value);
 
-            Promise.all(a_promises).then(function(result){
-                if (result.length === 1) resolve($ISIS.extractMembers(result[0]));
-                else {
 
-                    var collection = [];
-                    for (var key in result) {
-                        collection.push($ISIS.extractMembers(result[key]));
-                    }
-
-                    resolve(collection);
+            if(self.autoInitResult) {
+                var a_promises = [];
+                for (var i=0; i < data.result.value.length; i++) {
+                    var value = data.result.value[i];
+                    a_promises.push($ISIS.ajax(value.href));
                 }
-            });
+
+                Promise.all(a_promises).then(function(result){
+                    if (result.length === 1) resolve($ISIS.extractMembers(result[0]));
+                    else {
+                        var collection = [];
+                        for (var key in result) {
+                            collection.push($ISIS.extractMembers(result[key]));
+                        }
+                        resolve(collection);
+                    }
+                });
+            }else {
+                resolve(data);
+            }
         });
     };
 

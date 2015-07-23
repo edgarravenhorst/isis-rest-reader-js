@@ -4,9 +4,10 @@ var ISIS = function(){
 
     this.storeMembers = undefined;
 
-    this.store = (function(members){
+    this.store = (function(members, initialized){
         if (members) return members;
-        console.error('Please use $ISIS.init() before using the store');
+        else if(!initialized) console.error('Please use $ISIS.init() before using the store');
+        return {};
     })(this.storeMembers);
 
     this.settings = {
@@ -29,10 +30,23 @@ var ISIS = function(){
         return this.ajax(url, settings).then(function(data){
             return new Promise(function(resolve, reject) {
                 var members = $ISIS.extractMembers(data);
-                if(url === self.settings.baseurl) self.store = members;
+                if(url === self.settings.baseurl) {
+                    self.store = members;
+                }
                 resolve(members);
             });
         });
+    };
+
+    this.get = function(url, params) {
+        url = url || '';
+        params = params || {};
+
+        var settings = {};
+        settings.method = "GET";
+        settings.params = params;
+
+        return this.ajax(url, settings);
     };
 
     this.post = function(url, params, formatJsonForIsis) {
